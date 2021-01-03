@@ -1,0 +1,53 @@
+텔넷정리
+	-원격 시스템 관리 툴(프로그램 및 프로토콜 서버)
+1) 패키지 프로그램 설치
+	1-1) 먼저, CD-ROM 삽입(캡쳐)
+
+	1-2) CD-ROM 마운트 연동
+	# mount /dev/sr0 /mnt/
+	# df -h | grep sr0
+	
+	1-3) 패키지 설치
+	# cd /mnt/Packages/
+	# ls telnet*x86* telnet*noarch* | nl
+	패키지 설치
+	#rpm -ivh telnet-0.~
+	#rpm -ivh telnet-server~
+	#cd ~
+
+	# rpm -qa | grep telnet | nl
+	 1  telnet-0.17-65.el7_8.x86_64
+	 2  telnet-server-0.17-65.el7_8.x86_64
+
+2) 방화벽 설정
+	2-1) 포트/전송프로토콜
+	#firewall-cmd --permanent --add-port=23/tcp
+
+	2-2) 서비스 이름
+	#firewall-cmd --permanent --add-service=telnet
+	
+	2-3) 방화벽 재시작
+	#firewall-cmd --reload
+
+	2-4) 방화벽 설정 확인
+	# firewall-cmd --list-ports (포트만)
+	# firewall-cmd --list-services (서비스 이름만)
+	# firewall-cmd --list-all (방화벽 전체 환경 목록)
+
+3) 데몬 구동
+	3-1) 데몬 활성
+	#systemctl enable telnet.socket
+	
+	3-2) 데몬 재실행
+	#systemctl restart telnet.socket
+
+4) 클라이언트 -> 텔넷 서버 접근
+putty : telnet [텔넷서버 주소] : 23
+텔넷 보안상 관리자 접속 X, 따라서 다음과 같이 일반 사용자로 접속 후,
+관리자 권한을 획득(위임)
+samadal$ su -		[su: 슈퍼유저(root), -: 권한 옵션(전체)]
+암호: 1
+#
+
+
+
