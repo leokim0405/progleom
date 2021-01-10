@@ -1,0 +1,289 @@
+-m -k = 임의로 만든 skel 디렉터리를 사용하는 옵션
+- -m -k 옵션을 사용하지 않으면 새로 생성되는 사용자 홈 디렉터리 안에는 /etc/skel 디렉터리에
+  들어있는 모든 파일과 디렉터리를 복사해서 생성됩니다
+- 만약 /etc/skel 디렉터리가 아니라 자신이 만든 디렉터리로 사용자 홈 디렉터리의 skel 파일을 생성하고
+  싶다면 -m -k 옵션을 사용해서 지정합니다
+
+# mkdir /etc/samskel
+# cp /etc/skel/.b* /etc/samskel/
+# cp /etc/skel/.kshrc /etc/samskel/
+# cp -r /etc/skel/.mozilla/ /etc/samskel/
+# ls -la /etc/samskel/
+합계 36
+drwxr-xr-x    3 root root  4096 10월 10 09:45 .
+drwxr-xr-x. 142 root root 12288 10월 10 09:40 ..
+-rw-r--r--    1 root root    18 10월 10 09:45 .bash_logout
+-rw-r--r--    1 root root   193 10월 10 09:45 .bash_profile
+-rw-r--r--    1 root root   231 10월 10 09:45 .bashrc
+-rw-r--r--    1 root root   172 10월 10 09:45 .kshrc
+drwxr-xr-x    4 root root  4096 10월 10 09:45 .mozilla
+#
+
+/etc/skel 과 내용물의 차이점을 만들기 위해서 samskel 디렉터리에 디렉터리를 생성합니다
+# mkdir /etc/samskel/test
+
+useradd -D 를 입력하면 useradd에 설정된 기본값을 확인할 수 있습니다
+vi /etc/default/useradd로 직접 수정할 수 있습니다
+
+================================================================================
+
+사용자 정보 수정
+- 이미 생성된 사용자의 정보를 수정하는 명령어 usermod를 사용합니다
+- 사용형식과 옵션은 useradd와 동일합니다
+- /etc/passwd에 정보를 수정합니다
+
+usermod [옵션1] [값1] [옵션2] [값2] [수정하고 싶은 사용자명]
+ex) usermod -d /itbank/user1 user1
+
+옵션
+-c = 코멘트 변경
+ex) usermod -c test user1
+-d = 홈 디렉터리의 경로를 바꾸고 싶을 때
+ex) usermod -d /itbank/user1 user1
+-s = 쉘을 변경
+ex) usermod -s /bin/ksh user1
+-m -d = passwd에 들어있는 홈 디렉터리의 정보와 실제 홈 디렉터리의 위치도 같이 변경
+ex) usermod -m -d /home/user1 user1
+
+=========================================================================
+
+계정 삭제
+
+userdel [옵션] [삭제하고 싶은 사용자명]
+ex) userdel user1
+
+- userdel만 사용하면 passwd안에 정보만 삭제가 됩니다
+- 실제로 사용자 홈 디렉터리와 /var/spool/mail 안에 들어있는
+  메일파일은 그대로 남아있습니다
+
+[옵션]
+-r = passwd에 정보와 사용자 홈 디렉터리 그리고 메일파일도 한번에 삭제하는 옵션
+ex) userdel -r user2
+
+================================================================================
+
+권한(Permission)
+- 리눅스에서 권한은 허가권 그리고 소유권으로 확인합니다
+- 디렉터리나 파일에는 반드시 허가권, 소유권이 존재합니다
+- 권한 설정에 따라서 디렉터리나 파일을 관리할 수 있습니다
+- 허가권,소유권은 ls -l 명령어를 이용해서 확인할 수 있습니다
+
+허가권 : chmod (Change Modfication)
+- 허가권은 디렉터리나 파일에 읽기,쓰기,실행 및 접근 권한을 표현
+
+소유권 : chown (Change Ownership)
+- 소유권은 디렉터리나 파일을 소유하고 있는 계정과 그룹이 누구인지 나타내는 권한
+
+# ls -l /backup/
+합계 16
+-rw-r--r--. 1 root root 4303  5월  3 17:44 grub.cfg
+-rw-r--r--. 1 root root  511  5월  3 17:44 inittab
+-rw-r--r--  1 root root 2106  9월 27 11:21 login.defs
+#
+
+-rw-r--r-- = 허가권
+root root = 소유권(UID,GID)
+
+허가권은 r,w,x로 구성합니다
+
+r = read = 읽기 권한
+w = wrtie = 쓰기 권한
+x = execute = 접근 ,실행 권한
+
+허가권에서 사용하는 rwx는 문자마다 가지고있는 숫자 표기 방식이 있습니다
+r = 4
+w = 2
+x = 1
+
+rwx	|	rwx	|rwx
+421		421	 421
+700	 	 70	   7 = 777
+
+rwxrwxrwx= 777
+
+# ls -l /backup/
+합계 16
+-rw-r--r--. 1 root root 4303  5월  3 17:44 grub.cfg
+-rw-r--r--. 1 root root  511  5월  3 17:44 inittab
+-rw-r--r--  1 root root 2106  9월 27 11:21 login.defs
+
+grub.cfg 허가권은 rw-r--r-- 입니다
+허가권은 3개씩 끊어서 분류합니다 rw- | r-- | r--
+끊어서 각각 rwx의 숫자를 더해서 계산을 하면 허가권을 숫자로 표현할 수 있습니다
+ex)rw- | r-- | r-- --> 6 | 4 | 4 = 644
+
+owner 	group 	other
+rwx	rwx	rwx
+
+허가권은 onwer,group,other 3가지로 분류합니다
+허가권은 소유권과 같이 사용해야 합니다
+
+
+-rw-r--r--. 1 root root 4303  5월  3 17:44 grub.cfg
+현재 grub.cfg에 소유권은 root root로 나와있습니다
+root root는 각각 UID,GID를 의미합니다
+그래서 내가 지금 사용하고 있는 계정이 UID에 등록된 계정이면 허가권에서
+owner 부분에 권한을 확인해야 하고
+UID가 아닌 GID에 등록된 계정이면 group에 허가권을 확인합니다
+만약 UID도 아니고 GID도 아니면 other 부분에 권한을 확인합니다
+
+현재 samadal 계정의 홈 디렉터리의 허가권은 700이고 소유권은 samadal samadal 입니다
+만약 user1 계정을 생성해서 samadal 디렉터리에 접근하려고 하면 접근이 불가능합니다
+이유는 samadal 디렉터리 소유권이 samadal samadal 인데 user1은 UID 도 아니고 GID도 아니기 때문에
+other 부분에 권한을 확인합니다
+하지만 samadal 디렉터리는 other 부분에 권한이 아무것도 없기 때문에 user1 계정은 samadal 디렉터리에
+접근할 수 없습니다
+
+[user1@localhost ~]$ cd /home/samadal/
+-bash: cd: /home/samadal/: 허가 거부
+[user1@localhost ~]$
+
+허가권 변경
+
+숫자로 변경
+[사용형식]
+chmod [바꾸고 싶은 허가권 숫자] [파일 혹은 디렉터리]
+ex) chmod 777 /backup/grub.cfg
+
+문자로 변경
+- 문자를 이용해서 허가권을 변경하는 경우 사용할 수 있는 문자는 u,g,o 입니다
+- u는 onwer , g는 group, o는 other 부분을 의미합니다
+- 그래서 내가 지정하고 싶은 권한을 입력하고 + 혹은 - 를 이용해서 r,w,x 권한을 변경할 수 있습니다
+ex) chmod u-x,g-x,o-x /backup/grub.cfg
+
+소유권 변경
+[사용형식]
+
+1. chown samadal /backup/grub.cfg
+- UID만 samadal로 변경
+
+2. chown :samadal /backup/grub.cfg
+- GID만 samadal로 변경
+
+3. chown root: /backup/grub.cfg
+- UID,GID를 한번에 root로 변경
+
+4. chown samadal:user1 /backup/grub.cfg
+- UID는 samadal, GID는 user1로 변경
+
+: 대신 .를 사용할 수 있습니다
+# chown samadal.samadal /backup/grub.cfg
+# ls -l /backup/
+합계 16
+-rw-r--r--. 1 samadal samadal 4303  5월  3 17:44 grub.cfg
+-rw-r--r--. 1 root    root     511  5월  3 17:44 inittab
+-rw-r--r--  1 root    root    2106  9월 27 11:21 login.defs
+#
+
+===============================================================================
+
+디렉터리 권한 변경 실습
+
+/home/samadal 디렉터리를 사용해서 실습을 진행합니다
+samadal 디렉터리의 초기 허가권은 700입니다
+
+사용자 홈 디렉터리 같은 경우에는 초기 허가권이 700이고 소유권이 그 계정에 UID,GID로 사용하고 있기 떄문에
+다른 일반 사용자들이 접근할 수 없습니다 그 이유는 other 부분에 x(접근)가 없기 때문입니다
+
+root 에서 samadal 디렉터리의 허가권을 701로 변경
+# chmod 701 /home/samadal
+
+그리고 user1 계정으로 samadal 홈디렉터리에 접근합니다
+other 부분에 x가 있기때문에 다른계정도 samadal 디렉터리에 접근이 가능합니다
+
+하지만 user1 계정으로 디렉터리 접근은 가능하지만 내용물은 확인할 수 없습니다
+samadal 디렉터리에 other 부분에 r이 없기 때문에 ls 명령어를 사용할 수 없습니다
+
+[user1@localhost samadal]$ ls -la
+ls: cannot open directory .: 허가 거부
+
+root 계정으로 samadal 디렉터리의 허가권을 705로 변경합니다
+
+root 로 samadal 디렉터리 허가권 변경
+# chmod 705 /home/samadal
+
+user1에서 결과를 확인
+
+[user1@localhost samadal]$ ls -la
+합계 24
+drwx---r-x. 3 samadal samadal 4096  9월 27 12:26 .
+drwxr-xr-x. 4 root    root    4096 10월 10 12:11 ..
+-rw-r--r--. 1 samadal samadal   18  4월  1  2020 .bash_logout
+-rw-r--r--. 1 samadal samadal  193  4월  1  2020 .bash_profile
+-rw-r--r--. 1 samadal samadal  231  4월  1  2020 .bashrc
+drwxr-xr-x. 4 samadal samadal 4096  5월  4 02:19 .mozilla
+
+이번에는 user1로 samadal 디렉터리 안에서 파일 생성,삭제를 진행합니다
+하지만 samadal 디렉터리에 other 부분에 w가 없기 떄문에 디렉터리 내용물을 수정할 수 없습니다
+
+[user1@localhost samadal]$ touch testfile
+touch: cannot touch `testfile': 허가 거부
+[user1@localhost samadal]$
+
+root에서 samadal 디렉터리 other 부분에 w 추가
+# chmod 707 /home/samadal
+# ls -l /home/
+합계 8
+drwx---rwx. 3 samadal samadal 4096  9월 27 12:26 samadal
+drwx------  3 user1   user1   4096 10월 10 12:11 user1
+#
+
+user1 에서 samadal 디렉터리에 testfile 생성
+other 부분에 w가 있기 떄문에 다른 사용자가 자유롭게 디렉터리의 내용물을
+수정할 수 있습니다
+
+[user1@localhost samadal]$ touch testfile
+[user1@localhost samadal]$ rm -rf testfile
+
+======================================================================
+
+파일에 허가권 변경
+
+/backup/inittab로 실습
+
+최초 inittab은 허가권 644 소유권은 root root 입니다
+그래서 root 이외에 계정이 inittab을 사용하면 other 부분에 권한을 봐야하는데
+문서파일은 디렉터리와 다르게 실행파일이 아니라서 x가 필요없습니다 하지만 반드시 r이 있어야 파일의
+내용을 확인할 수 있기 때문에 r이 필수적으로 들어있어야 합니다(cat,vi,tail 등 사용불가)
+
+
+inittab 허가권을 640으로 변경하고 user1 계정으로 확인합니다
+
+# chmod 640 /backup/inittab
+# ls -l /backup/
+합계 16
+-rw-r--r--. 1 samadal samadal 4303  5월  3 17:44 grub.cfg
+-rw-r-----. 1 root    root     511  5월  3 17:44 inittab
+-rw-r--r--  1 root    root    2106  9월 27 11:21 login.defs
+#
+
+user1 계정으로 확인하면 cat,vi,tail 등 문서내용을 확인하는 명령어는
+전부 사용할 수 없습니다
+
+[user1@localhost samadal]$ tail /backup/inittab
+tail: cannot open `/backup/inittab' for reading: 허가 거부
+
+이번에는 inittab을 646으로 변경합니다
+# chmod 646 inittab
+처음 644는 other부분에 w가 없기 때문에 소유권자를 제외한 일반 계정들은 문서파일을 수정할 수 없습니다
+하지만 other에 w를 주면 소유권자 이외에 계정들도 문서파일을 자유롭게 수정할 수 있습니다
+
+vi를 사용해서 user1 계정으로 inittab 파일에 내용을 수정할 수 있는지 확인합니다
+결과는 otehr부분에 w가 있기 때문에 수정이 가능합니다
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
