@@ -1,0 +1,343 @@
+파일에 x권한이 없는 경우
+
+ls 명령어 실행파일로 실습
+
+# ls -l /bin/ls
+-rwxr-xr-x. 1 root root 117608  8월 20  2019 /bin/ls
+#
+
+실행파일은 허가권에 반드시 x가 있어야 합니다 리눅스에서 사용하는 명령어도
+전부 실행파일 입니다
+ls 명령어의 실행파일에서 other부분에 x를 제거합니다
+
+# chmod 754 /bin/ls
+# ls -l /bin/ls
+-rwxr-xr--. 1 root root 117608  8월 20  2019 /bin/ls
+#
+
+그리고 samadal 계정으로 로그인을 하고 ls 명령어를 사용합니다
+[samadal@localhost ~]$ ls -la
+-bash: /usr/bin/ls: 허가 거부
+[samadal@localhost ~]$
+
+samadal 계정이 ls 명령어를 실행하면 ls 실행파일의 소유권이 전부 root 입니다
+그래서 other부분에 권한을 보는데 x(실행권한)가 없어서 samadal은 ls 명령어를 사용할 수 없습니다
+
+============================================================================
+
+특수권한
+
+Set UID	  --->  4000  --->  --S --- ---
+Set GID   --->  2000  --->  --- --S ---
+Sticky Bit ---> 1000  --->  --- --- --T
+
+특수권한은 x 권한 자리를 같이 사용하는 특수권한이 있으면
+x는 보이지 않습니다 그래서 x가 있는지 없는지 판단하고 싶다면
+특수권한의 대소문자를 구분해야 합니다
+대문자는 x가 없는 경우를 의미하고
+소문자는 x가 있다는 것을 의미합니다
+
+rwSr---wx = 4643
+-w-rws--x = 2271
+rwxr-xr-t = 1755
+
+sticky bit 실습
+
+root로 접속 후 user1 계정 생성
+/sb 디렉터리를 생성하고 허가권을 777로 변경합니다
+그리고 samadal,user1 계정은 /sb 디렉터리에서 각각 하나씩 파일을 생성합니다
+
+[samadal@localhost ~]$ touch /sb/f1
+[samadal@localhost ~]$
+
+[user1@localhost ~]$ touch /sb/f2
+[user1@localhost ~]$
+
+[samadal@localhost ~]$ ls -l /sb
+합계 0
+-rw-rw-r-- 1 samadal samadal 0 10월 11 10:24 f1
+-rw-rw-r-- 1 user1   user1   0 10월 11 10:24 f2
+
+그리고 samadal은 f2를 지우고 user1 계정은 f1을 삭제합니다
+/sb 디렉터리에 other 부분에 w가 있습니다 그래서 모든 일반 사용자들은
+쓰기권한을 가지고 있기 떄문에 다른 계정이 만든 파일도 삭제할 수 있습니다
+
+이제 /sb 디렉터리에 sticky bit를 입력합니다
+허가권은 1777로 지정합니다
+
+# chmod 1777 /sb
+# ls -ld /sb
+drwxrwxrwt 2 root root 4096 10월 11 10:29 /sb
+#
+
+그리고 samadal은 f1파일 user1 은 f2파일을 생성합니다
+
+samadal은 f2, user1은 f1을 다시 삭제합니
+하지만 이번에는 에러가 발생하면서 삭제가 안됩니다
+[samadal@localhost ~]$ touch /sb/f1
+[samadal@localhost ~]$ rm -rf /sb/f2
+rm: cannot remove `/sb/f2': 명령을 허용하지 않음
+[samadal@localhost ~]$
+
+실습 결과
+sticky bit는 공용 디렉터리를 만들 때 효과적입니다
+sticky bit를 지정하면 그 디렉터리 안에서 쓰기 권한을 사용할 수 있지만
+다른 계정이 만든 파일이나 디렉터리를 수정할 수는 없습니다
+수정은 자신이 만든 파일과 디렉터리만 가능합니다
+
+==========================================================================
+
+Set UID
+
+cd /usr/bin 이동 후 ls -l passwd 입력
+
+그리고 passwd 파일의 허가권을 777로 변경
+
+# chmod 777 passwd
+# ls -l passwd
+-rwxrwxrwx. 1 root root 27856  4월  1  2020 passwd
+#
+
+samadal 계정으로 passwd 명령어를 사용해서 자신의 패스워드를 변경합니다
+
+[samadal@localhost ~]$ passwd
+samadal 사용자의 비밀 번호 변경 중
+samadal에 대한 암호 변경 중
+(현재) UNIX 암호:
+새  암호:
+새  암호 재입력:
+passwd: 인증 토근 수정 오류
+[samadal@localhost ~]$
+
+실습 결과
+passwd 명령어는 실행할 수 있지만 패스워드는 변경이 안됩니다
+passwd 명령어는 root의 권한으로 실행하기 때문에 일반 사용자는 SetUID가 없으면 사용할 수 없습니다
+SetUID는 일반 사용자가 SetUID에 지정된 파일에 UID 권한을 일시적으로 빌려서 사용하는 특수권한 입니다
+윈도우에서 관리자 권한으로 실행과 비슷한 효과입니다
+
+==================================================================
+
+SetGID 실습
+
+SetGID는 SetUID 와 반대로 그룹에 권한을 사용합니다
+특징으로 디렉터리 Set GID를 부여하고 다른 계정이 그 디렉터리에서 파일을 생성하면
+GID 부분이 SetGID가 설정되어 있는 디렉터리의 GID와 동일하게 생성이 됩니다
+
+root 에서 /test 생성
+chmod 2777 /test 입력
+그리고 samadal로 들어와서 /test 안에 아무 파일이나 생성 후 ls -l로 소유권을 확인
+
+결과 GID가 samadal이 아닌 root로 생성이 되어있습니다
+
+[samadal@localhost test]$ ls -l
+합계 0
+-rw-rw-r-- 1 samadal root 0  4월  5 16:39 f1
+
+=======================================================================
+
+유마스크(umask)
+- umask는 공통적인 권한을 가지고 있는 디렉터리나 파일을 생성할 때 효과적으로 사용할 수 있습니다
+- 파일이나 디렉터리를 생성하면 나오는 초기 허가권을 설정합니다
+
+umask 확인 방법
+#umask
+0022
+
+연습
+- root로 /home/samadal 안에 d1 디렉터리와 f1 파일을 생성합니다
+- ls -l 로 허가권을 확인합니다
+
+# mkdir /home/samadal/d1
+# touch /home/samadal/f1
+# ls -l /home/samadal/
+합계 4
+drwxr-xr-x 2 root root 4096 10월 11 11:15 d1
+-rw-r--r-- 1 root root    0 10월 11 11:15 f1
+#
+
+디렉터리는 755, 파일은 644로 생성되어 있습니다
+
+umask 값을 사용해서 초기 허가권을 계산하는 방법
+
+디렉터리의 초기 허가권을 먼저 구하고 싶다면 디렉터리의 최대 권한인 777에서 uamsk 값을 빼면
+바로 초기 허가권이 나옵니다
+
+777 - 22 = 755(관리자)
+777 - 2 = 775(일반사용자)
+
+파일의 허가권을 구하고 싶다면 파일의 최대 권한인 666에서 umask 값을 뺴면
+초기 허가권이 나옵니다
+
+666 - 22 = 644(관리자)
+666 - 2 = 664(일반사용자)
+
+umask를 변경하는 방법
+umask [변경하고 싶은 umask 값]
+ex) umask 304
+
+umask를 304로 변경하면 디렉터리는 777 - 304 = 473로 문제없이 생성이 됩니다
+하지만 파일은 666 - 304 = 362가 나와야 합니다 하지만 실제로 확인해보면 462로 나옵니다
+파일은 umask를 계산하는 방법이 디렉터리와 조금 다릅니다
+
+파일 umask 계산법
+
+rw-	rw-	rw- = 666
+-wx	---	r-- = 304
+==================================
+r-x	rw-	-w- = 562
+r-- 	rw-	-w- = 462(파일은 x를 사용하지 않기 떄문에 마지막에 x를 제거합니다)
+
+================================================================================
+
+압축기능
+- 대용량 파일의 크기를 줄여서 보관하고 싶은 때 사용하는 방식
+
+1. gzip
+- 다중압축 지원 X
+- 압축하면 원본파일이 사라짐
+- 압축방법 : gzip [파일명]
+ 	   ex) gzip grub.cfg
+- 압축풀기 : gunzup [압축파일명]
+	   ex) gunzip grub.cfg.gz
+
+2. Bzip2
+- 다중압축 지원 X
+- 압축하면 원본파일이 사라짐
+- 압축방법 : Bzip2 [파일명]
+	  ex) bzip2 grub.cfg
+- 압축풀기 : bunzip [파일명]
+	 : ex) bunzip2 grub.cfg.bz2
+
+3.xz
+- 다중압축 지원 X
+- 압축하면 원본파일이 사라짐
+- 압축방법 : xz [파일명]
+	 ex) xz grub.cfg
+- 압축풀기 : unxz [파일명]
+	 ex)unxz grub.cfg.xz
+
+
+4. tar
+- tar는 용량을 줄이는 압축이 아닌 다수의 파일을 하나로 묶어주는 역할을 합니다
+- 묶여서 나오는 파일을 아카이브 파일 이라고 말하며 저장소를 의미합니다
+- tar로 묶으면 압축이 아니라서 원본파일이 사라지지 않고 그대로 유지됩니다
+- 아카이브 파일을 풀어도 아카이브 파일을 그대로 남아서 계속 사용할 수 있습니다
+
+tar 사용형식
+
+tar 옵션
+c : 새 아카이브 파일을 생성합니다
+v : 아카이브 파일을 묶거나 푸는 과정을 출력합니다
+f : tar를 사용할 때 아카이브 파일을 지정합니다
+x : 아카이브 파일을 풀 때 사용합니다
+
+tar 생성
+tar [옵션] [아카이브파일 이름.tar] [파일1] [파일2] ...
+ex) tar cvf test.tar inittab grub.cfg login.defs
+
+tar 풀기
+tar [옵션] [아카이브파일 이름]
+ex) tar xvf test.tar
+
+tar를 사용해서 gzip 혹은 bzip2 등을 한번에 압축 및 압축해제 하는 방법
+- 옵션 z,j 를 추가적으로 사용해서 tar로 아카이브 파일을 만들면서 압축까지 가능합니다
+
+z = tar + gzip
+	ex) tar cvfz test.tar.gz inittab login.defs grub.cfg
+j = tar + bzip2
+	ex) tar cvfj test.tar.bz2 inittab login.defs grub.cfg
+
+압축을 해제하고 싶다면 tar xvf 옵션을 그대로 사용하면 됩니다
+
+5. zip
+- 윈도우에서 사용하는 zip과 동일
+- 다중압축을 지원합니다
+
+zip [아카이브 파일.zip] [파일1] [파일2] ...
+ex) zip test.zip login.defs inittab grub.cfg
+
+# zip test.zip login.defs inittab grub.cfg
+  adding: login.defs (deflated 50%)
+  adding: inittab (deflated 43%)
+  adding: grub.cfg (deflated 69%)
+#
+
+압축해제는 unzip으로 진행합니다
+ex) unzip test.zip
+
+=====================================================================
+
+rpm(패키지)
+- rpm은 프로그램 유틸리티 프로그램을 설치하는 것으로 윈도우에서 응용프로그램을
+  설치하는 것과 유사합니다
+- rpm(Redhat Package Manager)는 초창기 tar를 사용하고 있던 유닉스,리눅스 에서 패키지
+  라는 개념을 도입해서 프로그램의 설치,삭제 그리고 업그레이드를 편리하게 작업할 수 있도록 만들어서
+  리눅스의 구성에 많은 도움을 주고 있습니다
+
+===============================================================================
+rpm 패키지 파일의 구성
+
+vim-enhanced-7.4.629-6.el7.x86_64.rpm
+| 패키지명  |  |  버전      | |아키텍처|
+
+=============================================================================
+
+rpm 명령어(매우 중요!)
+
+1) 패키지 설치 : rpm -ivh 패키지 전체 이름
+ex) rpm -ivh vim-enhanced-7.4.629-6.el7.x86_64.rpm
+-i = 레드헷 계열 리눅스에 패키지를 설치
+-v = 상세하게 설치과정을 출력
+-h = 패키지를 설치하는 과정에서 해쉬마크(#) 출력
+
+2) 패키지 삭제 : rpm -e 패키지 이름
+ex) rpm -e vim-enhanced
+-e : 리눅스에 설치된 패키지를 삭제
+
+3) 패키지 확인 : rpm -qa | grep 패키지 이름
+ex) rpm -qa | grep vim
+
+=====================================================================
+
+rpm 실습
+
+현재 rpm -qa | grep vim 으로 vim 패키지를 확인하면 기본적으로 설치가 되어있습니다
+# rpm -qa | grep vim
+vim-filesystem-7.4.629-6.el7.x86_64
+vim-minimal-7.4.629-6.el7.x86_64
+vim-common-7.4.629-6.el7.x86_64
+vim-enhanced-7.4.629-6.el7.x86_64
+
+
+vim 패키지를 먼저 삭제하고 다시 설치를 진행합니다
+
+
+vim-common 패키지를 삭제하려고 하면 의존성 문제가 발생합니다
+패키지는 서로 의존성으로 연결되어 있는데 지금 발생한 문제는
+vim-common을 지우려면 vim-enhanced를 먼저 지우라는 문제입니다
+의존성 문제를 해결하지 못하면 다음 작업을 진행할 수 없습니다
+
+# rpm -e vim-common
+오류: Failed dependencies:
+        vim-common = 2:7.4.629-6.el7 is needed by (installed) vim-enhanced-2:7.4.629-6.el7.x86_64
+#
+
+의존성을 제기한 패키지를 먼저 삭제합니다
+# rpm -e vim-enhanced
+# rpm -e vim-common
+# rpm -e vim-filesystem
+# rpm -e vim-minimal
+오류: Failed dependencies:
+        /usr/bin/vi is needed by (installed) sudo-1.8.23-9.el7.x86_64
+# rpm -e sudo
+# rpm -e vim-minimal
+#
+
+
+
+
+
+
+
+
+
