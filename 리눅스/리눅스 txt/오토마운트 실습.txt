@@ -1,0 +1,9 @@
+mkfs.xfs -f /dev/sdc6
+=> 강제로 포맷형식 xfs로 변경
+
+mkdir /KG/
+cd 
+
+vi /etc/fstab
+=> 오토마운트 설정
+/dev/sdc
