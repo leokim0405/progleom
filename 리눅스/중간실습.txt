@@ -1,0 +1,13 @@
+nfs 를 위한 시스템 2개 필요
+
+dns설정 파일에서 sauron.co.kr 적용
+
+유저 sauron 생성
+dir 설정
+
+alias 적용해서 public_html 나오도록
+
+조건)
+hdd 오토마운트 하고 nfs 이용
+
+클라이언트 쪾에는 ftp autofs 사용
