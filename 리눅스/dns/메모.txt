@@ -1,0 +1,2 @@
+mailcap-2.1*.noarch* 로 
+/etc/mine.type 의 의존성 해결
