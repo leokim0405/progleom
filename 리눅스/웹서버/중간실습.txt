@@ -1,0 +1,24 @@
+중간 종합 실습
+실습(기존에 작업했던 시스템들은 삭제)
+
+Domain			: sauron.co.kr[호스트 이름은 원하는대로]
+
+USER			: sauron(사용자 홈 디렉터리와 동시에 DocumentRoot경로)
+
+$HOME			: /sauron_dir/home/
+
+Auto Creating Directory	: public_html/
+
+Auto Creating File	: .sauron(user_sauron이라는 내용출력파일)
+
+사용자 지정 SKEL		: /skel/
+
+Alias			: 호스트.sauron.co.kr/sauron 검색시 public_html/의 웹문서 출력
+
+*조건 
+HDD(1G:		1G(sauron)으로 파티션 잡고,
+1G잡은 파티션을 NFS를 이용해서 기본문서(index.html)를 넘길 것
+(기본문서는 반드시 윈도우에서 생성 후 업로드)
+*결과:웹 출력내용은 호스트.sauron.co.kr(메인 페이지)와, 호스트.sauron.co.kr/Alias한경로 
+2개 웹 화면 출력
+(단, 도메인 검색(웹)은 Autofs한 클라이언트 시스템에서 해봅니다.)
