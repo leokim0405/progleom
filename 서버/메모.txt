@@ -1,0 +1,18 @@
+VMware Network Adapter
+	- bridged
+	> host PC를 이용하여 host PC가 연결된 네트워크에 연결
+	   host PC가 소속된 네트워크에서 bridged 네트워크를 사용하는 가상머신을 연결 가능
+	   host PC가 인터넷이 가능하다면 bridged 네트워크를 사용하는 가상머신도 인터넷 연결 가능
+	
+	- NAT
+	> host PC의 VMware가 자체적으로 NAT service 동작
+	   별도의 바인딩(NAT table)이 없다면 NAT 네트워크 바깥쪽에서 가상머신으로 연결 시도 불가능
+
+	- Host only
+	> host PC 전용 네트워크
+	   가상머신이 저장된 컴퓨터 내부에서만 동작하는 네트워크
+	   기본적으로 외부와의 통신이 불가능하다
+
+
+
+
