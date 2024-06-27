@@ -1,0 +1,22 @@
+L3 ip는 vlan1으로 줌
+
+<포트 할당>
+vlan 10	(vlan 생성)
+
+int fa0/0 (컴과 연결된 포트)
+switchport mode access
+switchprot access vlan 10
+
+int fa 0/3
+switchport mode trunk (스위치끼리 연결된 포트)
+
+<다른 vlan과 통신하기 위할떄>
+라우터생성
+int fa0/0
+no shutdown
+
+int fa0/0.10
+encapsulation dot1q 10
+ip address ~
+
+int fa0/0.20. 에서도 마찬가지

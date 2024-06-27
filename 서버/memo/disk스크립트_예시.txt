@@ -1,0 +1,36 @@
+select disk 3
+clean
+convert dynamic
+select disk 2
+clean
+convert dynamic
+select disk 1
+clean
+convert dynamic
+
+create volume simple size=1000
+assign letter=s
+assign mount=C:\simple
+format fs=ntfs quick
+
+create volume simple size=1000
+extend size=1000 disk=2
+assign letter=p
+assign mount=C:\span
+format fs=ntfs quick
+
+create volume stripe size=1000 disk=1,2,3
+assign letter=t
+assign mount=C:\stripe
+format fs=ntfs quick
+
+create volume simple size=1000
+add disk 2
+assign letter=m
+assign mount=C:\mirror
+format fs=ntfs quick
+
+create volume raid size=1000 disk=1,2,3
+assign letter=r
+assign mount=C:\raid
+format fs=ntfs quick

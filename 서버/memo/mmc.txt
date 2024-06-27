@@ -1,0 +1,4 @@
+client의 mmc에 아래의 스냅인들을 추가 후 바탕화면에 원하는 파일명으로 저장
+ - computer management(local)
+ - computer management(remote - AD)
+ - active directory users and computers

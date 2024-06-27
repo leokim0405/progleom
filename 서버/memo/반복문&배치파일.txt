@@ -1,0 +1,21 @@
+
+반복문 & 배치파일 실습
+
+
+1. For 명령어를 이용하여 test ou에 'itXX' ou 10개 생성하기
+
+2. For 명령어를 이용하여 test ou에 'itXX' ou 10개 삭제하기
+
+3. 배치파일을 이용하여 test ou에 'batXX' ou 10개 생성하기
+
+4. 배치파일을 이용하여 test ou에 'batXX' ou 10개 삭제하기
+
+5. For 명령어를 이용하여 dsadd 명령어로 test OU에
+   101Test ~ 105Test 계정 생성하기
+
+
+
+
+Hint	: for /l %n in (1,1,5) do dsadd user "DN" -Option
+	  OU 생성 : dsadd ou
+	  객체 삭제 : dsrm

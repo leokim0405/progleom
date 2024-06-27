@@ -1,0 +1,4 @@
+image
+======
+ 생략-l2-생략 : L3 switch -> no ip route -> L2 switch
+ 생략-l3-생략 : L3 Router

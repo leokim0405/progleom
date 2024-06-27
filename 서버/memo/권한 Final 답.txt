@@ -1,0 +1,7 @@
+E:\1 권한
+ - 공유 권한  : everyone 모든 권한
+ - NTFS 권한 : administrator 모든 권한, everyone 읽기
+
+E:\1\2 권한
+ - NTFS 권한 : everyone 수정+쓰기 추가, administrator는 쓰기 거부
+  * 공유 권한은 무조건 상속받고 상속 해제가 불가능 하기 때문에 설정 X

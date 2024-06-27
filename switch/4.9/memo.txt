@@ -1,0 +1,25 @@
+show mac-address-table
+copy run start
+reload
+
+
+<정적 설정 방법>
+conf t 후에
+mac-address-table static 0000.0000.0001 vlan 1 interface fa0/1
+
+<스위치 ip 설정>
+
+interface vlan 1
+ip address [ip] [mask]
+no shutdown
+
+ip default-gateway [gateway ip]
+
+<telnet>
+서버
+line vty 0 5
+password cisco
+login
+
+pc
+telnet [ip]

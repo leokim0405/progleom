@@ -1,0 +1,8 @@
+1. 채널을 묶는다.
+2. 포로토콜을 준다.
+3. 모드를 변경한다.
+
+ex) 
+int range fa0/1 - 10
+channel-protocol lacp
+channel-group 1 mode (active, passive)

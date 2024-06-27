@@ -1,0 +1,1 @@
+chrome 띄워서 vmware에서 적힌 주소 입력

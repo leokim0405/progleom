@@ -1,0 +1,17 @@
+우리가 만든 itbank.com 도메인 내부에 test OU에 user라는 이름의 계정이 있다고 할 때
+user 계정을 다섯가지 표현 방식으로 표현
+
+	user logon name
+	 > user
+
+	user logon name(pre windows 2000)
+	 > itbank\user
+
+	UPN
+	 > user@itbank.com
+
+	DN
+	 > CN=user,OU=test,DC=itbank,DC=com
+
+	RDN
+	 > CN=user
