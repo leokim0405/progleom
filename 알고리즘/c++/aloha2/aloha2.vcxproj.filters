@@ -39,7 +39,19 @@
     <ClCompile Include="2776.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="4929.cpp">
+    <ClCompile Include="4929x.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="20153.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="24370.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="14709.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2018x.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -9,33 +10,41 @@ int main()
 	cin.tie(NULL);
 	cout.tie(NULL);
 
-	int board[9][9];
+	int C; cin >> C;
 
-	for (int i = 0; i < 9; i++)
+	vector<string> input;
+	vector<int> answer;
+
+	for (int i = 0; i < C; i++)
 	{
-		for (int j = 0; j < 9; j++)
-		{
-			cin >> board[i][j];
-		}
+		string sentence;
+		cin >> sentence;
+		input.push_back(sentence);
 	}
-	int max = board[0][0];
-	int x =0 , y=0;
 
-	for (int i = 0; i < 9; i++)
+	for (string str : input)
 	{
-		for (int j = 0; j < 9; j++)
+		int length = str.length(), score = 0, temp = 1;
+		for (int j = 0; j < length; j++)
 		{
-			if (max < board[i][j])
+			if (str[j] == 'O')
 			{
-				max = board[i][j];
-				x = i;
-				y = j;
+				score += temp++;
+
+			}
+			else
+			{
+				temp = 1;
 			}
 		}
-
+		answer.push_back(score);
 	}
 
-	cout << max << "\n" << x+1 << " " << y+1;
+	for (int x : answer)
+	{
+		cout << x << "\n";
+	}
+
 
 	return 0;
 }
